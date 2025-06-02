@@ -1,0 +1,9 @@
+torch
+numpy
+jupyterlab
+matplotlib
+sklearn
+catalyst
+collection
+pandas
+seaborn

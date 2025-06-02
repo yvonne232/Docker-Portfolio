@@ -1,0 +1,38 @@
+#!/bin/bash
+
+case "$1" in
+  "build"|"reset")
+    docker build --build-arg=UID=$(id -u) --build-arg=GID=$(id -g) -t my_python_im .
+    docker container rm my_python_con || true
+    docker container create -it -v "$PWD":/workdir -p 127.0.0.1:8888:8888 --name=my_python_con my_python_im sleep infinity
+    ;;
+  "start")
+    docker start my_python_con
+    ;;
+  "stop")
+    docker stop my_python_con
+    ;;
+  "exec")
+    shift
+    docker exec -it my_python_con "$@"
+    ;;
+  "python")
+    shift
+    docker exec -it my_python_con python "$@"
+    ;;
+  "notebook")
+    shift
+    docker exec -it my_python_con /home/myuser/.local/bin/jupyter-notebook --ip=0.0.0.0 --no-browser "$@"
+    ;;
+  "run")
+    shift
+    docker run --rm -it -v "$PWD":/workdir my_python_im "$@"
+    ;;
+  "run-notebook")
+    shift
+    docker run --rm -it -v "$PWD":/workdir -p 127.0.0.1:8888:8888 my_python_im /home/myuser/.local/bin/jupyter-notebook --ip=0.0.0.0 --no-browser "$@"
+    ;;
+  *)
+    echo "Unknown command"
+    ;;
+esac
